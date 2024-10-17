@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    android:padding="20dp">
+    android:padding="20dp"
+    tools:context=".MainActivity"
+    >
 
     <ImageView
         android:src="@drawable/book"
@@ -23,21 +27,35 @@
         android:textStyle="bold"
         android:textSize="20sp"/>
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
-        android:text="Log in"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/shape_button"
-        android:textColor="@color/white"/>
+    <!--No Account, Register-->
 
     <Button
+        android:id="@+id/loginBtn"
+        android:layout_width="371dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="224dp"
+        android:background="@drawable/shape_button"
+        android:text="Log in"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/continueWithoutLoginBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="104dp"
+        android:background="@drawable/shape_button2"
         android:text="Continue Without Login"
-        android:textColor="@color/purple_500"
-        android:background="@drawable/shape_button2"/>
+        android:textColor="@color/purple_500" />
+
+    <Button
+        android:id="@+id/noAccountTv"
+        android:layout_width="180dp"
+        android:layout_height="61dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="18dp"
+        android:padding="10dp"
+        android:text="New User? Sign Up" />
 
 </RelativeLayout>
