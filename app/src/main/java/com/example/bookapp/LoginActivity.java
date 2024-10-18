@@ -1,6 +1,5 @@
 package com.example.bookapp;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -8,6 +7,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,13 +24,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+
 public class LoginActivity extends AppCompatActivity {
 
     // Firebase Auth
     private FirebaseAuth firebaseAuth;
 
-    // Progress dialog
-    private ProgressDialog progressDialog;
+    // ProgressBar
+    private ProgressBar progressBar;
 
     // EditText fields for email and password
     private EditText emailEt, passwordEt;
@@ -46,24 +47,19 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login_activity);
 
         // Initialize views
-        emailEt = findViewById(R.id.emailEditText); // Replace with the correct ID from your layout
+        emailEt = findViewById(R.id.emailEditText);
         passwordEt = findViewById(R.id.passwordEditText);
         registerBtn = findViewById(R.id.registerButton);
-        loginBtn = findViewById(R.id.loginButton); // Ensure this ID matches the layout
+        loginBtn = findViewById(R.id.loginButton);
+        progressBar = findViewById(R.id.progressBar); // Initialize the ProgressBar
 
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
-
-        // Set up progress dialog
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Please wait");
-        progressDialog.setCanceledOnTouchOutside(false);
 
         // Handle register button click
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Redirect to RegisterActivity
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
@@ -84,68 +80,61 @@ public class LoginActivity extends AppCompatActivity {
 
         // Validate email and password
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            // Invalid email
             Toast.makeText(this, "Invalid email pattern!", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(password)) {
-            // Empty password
             Toast.makeText(this, "Enter password!", Toast.LENGTH_SHORT).show();
         } else {
-            // Data is valid, proceed to login
-            loginUser();
+            loginUser(); // Valid data, proceed with login
         }
     }
 
     private void loginUser() {
-        progressDialog.setMessage("Logging in...");
-        progressDialog.show();
+        // Show progress bar
+        progressBar.setVisibility(View.VISIBLE);
 
-        // Sign in using Firebase Auth
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        // Check user role after successful login
-                        checkUser();
+                        checkUser(); // Success, check user type
                     }
-                }).addOnFailureListener(new OnFailureListener() {
+                })
+                .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        // Login failed
-                        progressDialog.dismiss();
+                        // Hide progress bar and show error
+                        progressBar.setVisibility(View.GONE);
                         Toast.makeText(LoginActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void checkUser() {
-        // Get current user
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
         if (firebaseUser != null) {
-            // Check the user role in the database
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
             databaseReference.child(firebaseUser.getUid())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            // Get user role from the database
+                            // Hide progress bar
+                            progressBar.setVisibility(View.GONE);
+
                             String userRole = "" + snapshot.child("userRole").getValue();
-
-                            if ("User".equals(userRole)) {
-                                // Redirect to user dashboard
-
-                                finish();
-                            } else if ("Admin".equals(userRole)) {
-                                // Redirect to admin dashboard
-
-                                finish();
+                            if ("user".equals(userRole)) {
+                                Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
+                                startActivity(intent);
+                            } else if ("admin".equals(userRole)) {
+                                startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
                             }
+                            finish();
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
-                            // Database error handling
-                            progressDialog.dismiss();
+                            // Hide progress bar and show error
+                            progressBar.setVisibility(View.GONE);
                             Toast.makeText(LoginActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });

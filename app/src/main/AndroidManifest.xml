@@ -15,16 +15,21 @@
         android:theme="@style/Theme.BookApp"
         tools:targetApi="31">
         <activity
+            android:name=".UserDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:theme="@style/Theme.BookApp"/>
+            android:theme="@style/Theme.BookApp" />
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:theme="@style/Theme.BookApp"/>
+            android:theme="@style/Theme.BookApp" />
         <activity
             android:name=".MainActivity"
-
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.BookApp">
