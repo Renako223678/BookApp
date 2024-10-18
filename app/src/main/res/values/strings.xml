@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">BookApp</string>
+    <string name="sign_up_prompt">New User? Sign up</string>
+    <string name="back_button_description">Go back</string>
+    <string name="create_account">Create New Account</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="register">Register</string>
+    <string name="Please_login">Please login</string>
 </resources>
