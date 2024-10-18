@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
         Button noAccountTv = findViewById(R.id.noAccountTv);
         Button continueWithoutLoginBtn = findViewById(R.id.continueWithoutLoginBtn);
 
+
         // Set click listener for login button
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
