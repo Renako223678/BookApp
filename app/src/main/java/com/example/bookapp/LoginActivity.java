@@ -33,15 +33,16 @@ public class LoginActivity extends AppCompatActivity {
     private TextView forgotPasswordTextView;
     private ProgressBar progressBar;
 
-    // Firebase authentication instance
+    // Khởi tạo Firebase Authentication
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_activity);  // Inflate the layout
+        setContentView(R.layout.login_activity);  // Hiển thị giao diện
 
-        // Initialize views
+        // Khởi tạo các thành phần giao diện
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         loginButton = findViewById(R.id.loginButton);
@@ -49,10 +50,11 @@ public class LoginActivity extends AppCompatActivity {
         forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView);
         progressBar = findViewById(R.id.progressBar);
 
-        // Initialize Firebase Auth
+        // Khởi tạo Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
-        // Handle login button click
+
+        // Xử lý khi nhấn nút đăng nhập
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // Handle register button click (navigate to the register screen)
+        // Xử lý khi nhấn nút đăng ký (chuyển hướng đến màn hình đăng ký)
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,29 +70,29 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // Handle "Forgot Password" click
+        // Xử lý khi nhấn vào "Quên mật khẩu"
         forgotPasswordTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Implement forgot password logic here
-                Toast.makeText(LoginActivity.this, "Forgot Password clicked", Toast.LENGTH_SHORT).show();
+                // Thực hiện logic quên mật khẩu tại đây
+                Toast.makeText(LoginActivity.this, "Quên mật khẩu đã được nhấn", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Login logic using Firebase Authentication
+    // Logic đăng nhập sử dụng Firebase Authentication
     private void handleLogin() {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            emailEditText.setError("Please enter your email");
+            emailEditText.setError("Vui lòng nhập email của bạn");
             emailEditText.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            passwordEditText.setError("Please enter your password");
+            passwordEditText.setError("Vui lòng nhập mật khẩu của bạn");
             passwordEditText.requestFocus();
             return;
         }
@@ -104,15 +106,17 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            fetchUserTypeAndRedirect(user.getUid()); // Pass UID to fetch userType
+                            fetchUserTypeAndRedirect(user.getUid()); // Truyền UID để lấy userType
                         } else {
-                            Toast.makeText(LoginActivity.this, "Please verify your email first", Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, "Vui lòng xác minh email của bạn trước", Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        Toast.makeText(LoginActivity.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "Xác thực không thành công: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
+
+    // Lấy loại người dùng và chuyển hướng dựa trên loại người dùng
     private void fetchUserTypeAndRedirect(String uid) {
         progressBar.setVisibility(View.VISIBLE);
 
@@ -151,5 +155,4 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
 }
