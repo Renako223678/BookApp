@@ -3,19 +3,19 @@ package com.example.bookapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.AuthResult;
+import com.example.bookapp.MainActivity;
+import com.example.bookapp.R;
+import com.example.bookapp.RegisterActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -24,120 +24,135 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-
 public class LoginActivity extends AppCompatActivity {
 
-    // Firebase Auth
-    private FirebaseAuth firebaseAuth;
-
-    // ProgressBar
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private Button loginButton;
+    private Button registerButton;
+    private TextView forgotPasswordTextView;
     private ProgressBar progressBar;
 
-    // EditText fields for email and password
-    private EditText emailEt, passwordEt;
-
-    // Buttons for login and register
-    private Button registerBtn, loginBtn;
-
-    private String email = "", password = "";
+    // Khởi tạo Firebase Authentication
+    private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_activity);
+        setContentView(R.layout.login_activity);  // Hiển thị giao diện
 
-        // Initialize views
-        emailEt = findViewById(R.id.emailEditText);
-        passwordEt = findViewById(R.id.passwordEditText);
-        registerBtn = findViewById(R.id.registerButton);
-        loginBtn = findViewById(R.id.loginButton);
-        progressBar = findViewById(R.id.progressBar); // Initialize the ProgressBar
+        // Khởi tạo các thành phần giao diện
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        loginButton = findViewById(R.id.loginButton);
+        registerButton = findViewById(R.id.registerButton);
+        forgotPasswordTextView = findViewById(R.id.forgotPasswordTextView);
+        progressBar = findViewById(R.id.progressBar);
 
-        // Initialize Firebase Auth
-        firebaseAuth = FirebaseAuth.getInstance();
+        // Khởi tạo Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference("Users");
 
-        // Handle register button click
-        registerBtn.setOnClickListener(new View.OnClickListener() {
+        // Xử lý khi nhấn nút đăng nhập
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleLogin();
+            }
+        });
+
+        // Xử lý khi nhấn nút đăng ký (chuyển hướng đến màn hình đăng ký)
+        registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
             }
         });
 
-        // Handle login button click
-        loginBtn.setOnClickListener(new View.OnClickListener() {
+        // Xử lý khi nhấn vào "Quên mật khẩu"
+        forgotPasswordTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                validateData();
+            public void onClick(View v) {
+                // Thực hiện logic quên mật khẩu tại đây
+                Toast.makeText(LoginActivity.this, "Quên mật khẩu đã được nhấn", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void validateData() {
-        // Get data
-        email = emailEt.getText().toString().trim();
-        password = passwordEt.getText().toString().trim();
+    // Logic đăng nhập sử dụng Firebase Authentication
+    private void handleLogin() {
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
 
-        // Validate email and password
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Invalid email pattern!", Toast.LENGTH_SHORT).show();
-        } else if (TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Enter password!", Toast.LENGTH_SHORT).show();
-        } else {
-            loginUser(); // Valid data, proceed with login
+        if (TextUtils.isEmpty(email)) {
+            emailEditText.setError("Vui lòng nhập email của bạn");
+            emailEditText.requestFocus();
+            return;
         }
-    }
 
-    private void loginUser() {
-        // Show progress bar
+        if (TextUtils.isEmpty(password)) {
+            passwordEditText.setError("Vui lòng nhập mật khẩu của bạn");
+            passwordEditText.requestFocus();
+            return;
+        }
+
         progressBar.setVisibility(View.VISIBLE);
 
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult authResult) {
-                        checkUser(); // Success, check user type
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Hide progress bar and show error
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(LoginActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    progressBar.setVisibility(View.GONE);
+
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            fetchUserTypeAndRedirect(user.getUid()); // Truyền UID để lấy userType
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Vui lòng xác minh email của bạn trước", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Xác thực không thành công: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
-    private void checkUser() {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+    // Lấy loại người dùng và chuyển hướng dựa trên loại người dùng
+    private void fetchUserTypeAndRedirect(String uid) {
+        progressBar.setVisibility(View.VISIBLE);
 
-        if (firebaseUser != null) {
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users");
-            databaseReference.child(firebaseUser.getUid())
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            // Hide progress bar
-                            progressBar.setVisibility(View.GONE);
+        // Lấy userType từ Firebase Realtime Database
+        databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                progressBar.setVisibility(View.GONE);
 
-                            String userRole = "" + snapshot.child("userRole").getValue();
-                            if ("user".equals(userRole)) {
-                                Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
-                                startActivity(intent);
-                            } else if ("admin".equals(userRole)) {
-                                startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
-                            }
-                            finish();
-                        }
+                if (dataSnapshot.exists()) {
+                    // Lấy userType từ database
+                    String userType = dataSnapshot.child("userType").getValue(String.class);
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            // Hide progress bar and show error
-                            progressBar.setVisibility(View.GONE);
-                            Toast.makeText(LoginActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
+                    if ("admin".equals(userType)) {
+                        // Chuyển hướng đến bảng điều khiển Admin
+                        Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else if ("user".equals(userType)) {
+                        // Chuyển hướng đến bảng điều khiển User
+                        Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Loại người dùng không xác định", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, "Không tìm thấy dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(LoginActivity.this, "Lỗi cơ sở dữ liệu: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
