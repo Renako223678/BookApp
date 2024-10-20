@@ -1,72 +1,103 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/background"
-    >
+    android:background="@android:color/white"
+    tools:targetApi="33">
 
-    <!-- Top Section (Dashboard info) -->
-
-    <!-- Add Category Button -->
+    <!-- Top Bar (Dashboard Title, User Email, Logout Icon) -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#6A0DAD"
-        android:elevation="4dp"
-        android:gravity="center"
         android:orientation="vertical"
+        android:background="#6A0DAD"
         android:padding="16dp"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="109dp"
-        tools:layout_editor_absoluteY="16dp">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
             android:id="@+id/dashboardTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dashboard Admin"
-            android:textColor="#FFFFFF"
+            android:text="Admin Dashboard"
             android:textSize="18sp"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="admin@gmail.com"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp" />
+            android:text="admin@example.com"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
 
-        <!-- Power Icon -->
-
+        <ImageView
+            android:id="@+id/logoutIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_logout"
+            android:contentDescription="Logout Icon" />
     </LinearLayout>
 
-    <!-- Circular Button (PDF) -->
-
-    <Button
-        android:id="@+id/addCategoryButton"
+    <!-- Search Bar -->
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:queryHint="Search categories..."
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
+
+    <!-- RecyclerView to display categories -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/addCategoryButton"
+        tools:listitem="@layout/row_category" />
+
+    <!-- Add Category Button -->
+
+    <!-- Floating Action Button for generating PDF or other actions -->
+    <Button
+        android:id="@+id/addCategoryButton"
+        android:layout_width="291dp"
+        android:layout_height="35dp"
+        android:layout_margin="16dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="#6A0DAD"
-        android:elevation="2dp"
         android:text="+ Add Category"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.133"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/pdfButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="124dp"
+        android:layout_width="56dp"
+        android:layout_height="39dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:contentDescription="Export to PDF"
+        android:src="@drawable/ic_pdf"
         app:backgroundTint="#6A0DAD"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
