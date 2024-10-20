@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +31,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private RecyclerView recyclerView;
     private AdapterCategory adapterCategory;
-    private ArrayList<ModelCategory> categoryList;
+    private ArrayList<ModelCategory> categoryArrayList;
     private SearchView searchView;
     private Button addCategoryButton;
     private FloatingActionButton pdfButton;
@@ -51,16 +52,16 @@ public class AdminDashboardActivity extends AppCompatActivity {
         pdfButton = findViewById(R.id.pdfButton);
 
         // Initialize RecyclerView and adapter
-        categoryList = new ArrayList<>();
-        adapterCategory = new AdapterCategory(this, categoryList);
+        categoryArrayList = new ArrayList<>();
+        adapterCategory = new AdapterCategory(this, categoryArrayList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapterCategory);
 
         // Load categories from Firebase
-        loadCategories();
+        loadCategoriesFromFirebase();
 
         // Setup search functionality
-        setupSearch();
+
 
         // Add category button click listener
         addCategoryButton.setOnClickListener(v -> {
@@ -86,51 +87,33 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
     }
 
-    private void loadCategories() {
+    private void loadCategoriesFromFirebase() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Categories");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // Clear the previous category list
-                categoryList.clear();
+                categoryArrayList.clear();  // Clear previous data
+
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    // Use 'getValue()' to convert the data into the ModelCategory object
                     ModelCategory category = ds.getValue(ModelCategory.class);
                     if (category != null) {
-                        // Optionally, set the ID from the snapshot key
-                        category.setId(ds.getKey());
-                        categoryList.add(category); // Add to your list
+                        categoryArrayList.add(category);
                     }
                 }
-                // Notify adapter that data has changed
+
+                // Notify the adapter that data has changed
                 adapterCategory.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("Firebase", "Error: " + error.getMessage());
+                Toast.makeText(AdminDashboardActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
-    private void setupSearch() {
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // Perform search when user submits the query
-                adapterCategory.getFilter().filter(query);
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // Perform search while user is typing
-                adapterCategory.getFilter().filter(newText);
-                return false;
-            }
-        });
-    }
 
 
     private void exportCategoriesToPDF() {

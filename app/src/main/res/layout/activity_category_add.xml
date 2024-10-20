@@ -16,7 +16,7 @@
             android:id="@+id/backBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="@android:drawable/btn_default"
             android:layout_margin="10dp"
             android:padding="5dp"
             android:src="@drawable/icon_back_white"/>

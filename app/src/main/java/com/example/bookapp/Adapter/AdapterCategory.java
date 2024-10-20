@@ -5,132 +5,92 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookapp.Models.ModelCategory;
 import com.example.bookapp.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class AdapterCategory extends RecyclerView.Adapter<AdapterCategory.HolderCategory> implements Filterable {
-
+public class AdapterCategory extends RecyclerView.Adapter<AdapterCategory.CategoryViewHolder> {
     private Context context;
-    private ArrayList<ModelCategory> categoryArrayList; // Original list
-    private ArrayList<ModelCategory> filteredCategoryList; // Filtered list
+    private ArrayList<ModelCategory> categoryList;
 
     // Constructor
-    public AdapterCategory(Context context, ArrayList<ModelCategory> categoryArrayList) {
+    public AdapterCategory(Context context, ArrayList<ModelCategory> categoryList) {
         this.context = context;
-        this.categoryArrayList = categoryArrayList;
-        this.filteredCategoryList = new ArrayList<>(categoryArrayList); // Initialize filtered list
+        this.categoryList = categoryList;
     }
 
     @NonNull
     @Override
-    public HolderCategory onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the custom row layout for each category
+    public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflate the layout for each category item
         View view = LayoutInflater.from(context).inflate(R.layout.row_category, parent, false);
-        return new HolderCategory(view);
-    }
-
-    // ViewHolder class to hold each category item
-    public class HolderCategory extends RecyclerView.ViewHolder {
-
-        // Declare views from the row_category.xml layout
-        TextView categoryTitle;
-        Button deleteBTN;
-
-        public HolderCategory(@NonNull View itemView) {
-            super(itemView);
-
-            // Initialize views
-            categoryTitle = itemView.findViewById(R.id.category_title);
-            deleteBTN = itemView.findViewById(R.id.ic_delete);
-        }
+        return new CategoryViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HolderCategory holder, int position) {
-        // Get the data for the current category
-        ModelCategory modelCategory = filteredCategoryList.get(position); // Use filtered list
+    public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
+        // Get current category
+        ModelCategory category = categoryList.get(position);
 
-        // Set the category title to the TextView
-        holder.categoryTitle.setText(modelCategory.getCategory());
-
-        // Set the click listener for the delete button
-        holder.deleteBTN.setOnClickListener(new View.OnClickListener() {
+        // Bind data to the views
+        holder.categoryNameTextView.setText(category.getCategory());
+        //delete category
+        // Handle delete category action
+        holder.deleteCategoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                // Call method to delete the category from Firebase
-                deleteCategory(modelCategory);
+            public void onClick(View v) {
+                deleteCategory(category.getId());  // Call the delete method with category ID
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        // Return the total number of filtered categories
-        return filteredCategoryList.size();
+        return categoryList.size();
     }
 
-    // Method to delete a category from Firebase
-    private void deleteCategory(ModelCategory modelCategory) {
-        // Get reference to the category in Firebase using its ID
+    // ViewHolder class to hold each category item view
+    class CategoryViewHolder extends RecyclerView.ViewHolder {
+        TextView categoryNameTextView;
+        Button deleteCategoryButton;
+
+        public CategoryViewHolder(@NonNull View itemView) {
+            super(itemView);
+            // Initialize views
+            categoryNameTextView = itemView.findViewById(R.id.categoryTitleTextView);
+            deleteCategoryButton = itemView.findViewById(R.id.deleteCategoryButton);
+        }
+    }
+    // Method to delete category from Firebase
+    private void deleteCategory(String categoryId) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Categories");
-        ref.child(modelCategory.getId()).removeValue()
-                .addOnSuccessListener(aVoid -> {
-                    // Success - you can notify the user if needed
-                    categoryArrayList.remove(modelCategory); // Remove the item from the original list
-                    filteredCategoryList.remove(modelCategory); // Remove from the filtered list
-                    notifyDataSetChanged(); // Notify adapter to update the UI
+        ref.child(categoryId)
+                .removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Category deleted successfully
+                        Toast.makeText(context, "Category deleted successfully...", Toast.LENGTH_SHORT).show();
+                    }
                 })
-                .addOnFailureListener(e -> {
-                    // Failure - you can notify the user if needed
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Deletion failed
+                        Toast.makeText(context, "Failed to delete category: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                String searchText = constraint.toString().toLowerCase();
-                FilterResults results = new FilterResults();
-
-                if (searchText.isEmpty()) {
-                    // If the search text is empty, return the original list
-                    results.values = categoryArrayList;
-                    results.count = categoryArrayList.size();
-                } else {
-                    // Create a new list to hold filtered categories
-                    List<ModelCategory> filteredList = new ArrayList<>();
-                    for (ModelCategory category : categoryArrayList) {
-                        // Check if the category title contains the search text
-                        if (category.getCategory().toLowerCase().contains(searchText)) {
-                            filteredList.add(category);
-                        }
-                    }
-                    results.values = filteredList;
-                    results.count = filteredList.size();
-                }
-
-                return results;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                // Update the filtered category list and notify the adapter
-                filteredCategoryList = (ArrayList<ModelCategory>) results.values;
-                notifyDataSetChanged();
-            }
-        };
-    }
 }
