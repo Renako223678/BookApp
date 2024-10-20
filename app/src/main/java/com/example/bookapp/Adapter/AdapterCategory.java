@@ -22,75 +22,68 @@ import java.util.ArrayList;
 
 public class AdapterCategory extends RecyclerView.Adapter<AdapterCategory.CategoryViewHolder> {
     private Context context;
-    private ArrayList<ModelCategory> categoryList;
+    private ArrayList<ModelCategory> categoryList; // Original list
+    private ArrayList<ModelCategory> filteredCategoryList; // Filtered list
 
     // Constructor
     public AdapterCategory(Context context, ArrayList<ModelCategory> categoryList) {
         this.context = context;
         this.categoryList = categoryList;
+        this.filteredCategoryList = new ArrayList<>(categoryList);
     }
 
     @NonNull
     @Override
     public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the layout for each category item
         View view = LayoutInflater.from(context).inflate(R.layout.row_category, parent, false);
         return new CategoryViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        // Get current category
-        ModelCategory category = categoryList.get(position);
+        ModelCategory category = filteredCategoryList.get(position); // Use filtered list
 
-        // Bind data to the views
         holder.categoryNameTextView.setText(category.getCategory());
-        //delete category
+
         // Handle delete category action
-        holder.deleteCategoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteCategory(category.getId());  // Call the delete method with category ID
-            }
-        });
+        holder.deleteCategoryButton.setOnClickListener(v -> deleteCategory(category.getId()));
     }
 
     @Override
     public int getItemCount() {
-        return categoryList.size();
+        return filteredCategoryList.size(); // Return filtered list size
     }
 
-    // ViewHolder class to hold each category item view
     class CategoryViewHolder extends RecyclerView.ViewHolder {
         TextView categoryNameTextView;
         Button deleteCategoryButton;
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Initialize views
             categoryNameTextView = itemView.findViewById(R.id.categoryTitleTextView);
             deleteCategoryButton = itemView.findViewById(R.id.deleteCategoryButton);
         }
     }
-    // Method to delete category from Firebase
+
     private void deleteCategory(String categoryId) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Categories");
-        ref.child(categoryId)
-                .removeValue()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Category deleted successfully
-                        Toast.makeText(context, "Category deleted successfully...", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Deletion failed
-                        Toast.makeText(context, "Failed to delete category: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        ref.child(categoryId).removeValue()
+                .addOnSuccessListener(aVoid -> Toast.makeText(context, "Category deleted successfully...", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(context, "Failed to delete category: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
+    public void filter(String query) {
+        filteredCategoryList.clear();  // Clear the current filtered list
+
+        if (query.isEmpty()) {
+            filteredCategoryList.addAll(categoryList);  // Show all categories if query is empty
+        } else {
+            for (ModelCategory category : categoryList) {
+                if (category.getCategory().toLowerCase().contains(query.toLowerCase())) {
+                    filteredCategoryList.add(category);  // Add matching categories
+                }
+            }
+        }
+        notifyDataSetChanged();  // Notify the adapter to refresh the view
+    }
 }

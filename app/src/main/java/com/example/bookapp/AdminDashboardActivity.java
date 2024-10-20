@@ -1,9 +1,7 @@
 package com.example.bookapp;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -41,7 +39,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_dashboard);
 
-        // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
         checkUser();
 
@@ -61,27 +58,33 @@ public class AdminDashboardActivity extends AppCompatActivity {
         loadCategoriesFromFirebase();
 
         // Setup search functionality
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapterCategory.filter(query); // Filter based on query
+                return false; // Return true if you handled the query submission
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapterCategory.filter(newText); // Filter based on text change
+                return true; // Return true if you handled the change
+            }
+        });
 
         // Add category button click listener
         addCategoryButton.setOnClickListener(v -> {
-            // Handle the action to add a new category
             Intent intent = new Intent(AdminDashboardActivity.this, CategoryAddActivity.class);
             startActivity(intent);
         });
 
-        // Export to PDF functionality (if needed)
-        pdfButton.setOnClickListener(v -> {
-            // Handle the action to generate a PDF report
-            exportCategoriesToPDF();
-        });
+        // PDF button functionality
+        pdfButton.setOnClickListener(v -> exportCategoriesToPDF());
     }
 
     private void checkUser() {
-        // Check if the user is logged in
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user == null) {
-            // Redirect to login screen if not logged in
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
@@ -92,7 +95,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                categoryArrayList.clear();  // Clear previous data
+                categoryArrayList.clear(); // Clear previous data
 
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     ModelCategory category = ds.getValue(ModelCategory.class);
@@ -100,25 +103,17 @@ public class AdminDashboardActivity extends AppCompatActivity {
                         categoryArrayList.add(category);
                     }
                 }
-
-                // Notify the adapter that data has changed
-                adapterCategory.notifyDataSetChanged();
+                adapterCategory.notifyDataSetChanged(); // Notify the adapter
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(AdminDashboardActivity.this, "" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminDashboardActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
-
-
-
     private void exportCategoriesToPDF() {
         // Code to export the categories to a PDF document
-        Log.d("PDF", "Exporting categories to PDF...");
-        // You can use libraries like iText or PdfDocument to generate the PDF
     }
 }
