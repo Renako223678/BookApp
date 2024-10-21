@@ -54,16 +54,7 @@ public class AdapterCategory extends RecyclerView.Adapter<AdapterCategory.Catego
         return filteredCategoryList.size(); // Return filtered list size
     }
 
-    class CategoryViewHolder extends RecyclerView.ViewHolder {
-        TextView categoryNameTextView;
-        Button deleteCategoryButton;
 
-        public CategoryViewHolder(@NonNull View itemView) {
-            super(itemView);
-            categoryNameTextView = itemView.findViewById(R.id.categoryTitleTextView);
-            deleteCategoryButton = itemView.findViewById(R.id.deleteCategoryButton);
-        }
-    }
 
     private void deleteCategory(String categoryId) {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Categories");
@@ -85,5 +76,15 @@ public class AdapterCategory extends RecyclerView.Adapter<AdapterCategory.Catego
             }
         }
         notifyDataSetChanged();  // Notify the adapter to refresh the view
+    }
+    class CategoryViewHolder extends RecyclerView.ViewHolder {
+        TextView categoryNameTextView;
+        Button deleteCategoryButton;
+
+        public CategoryViewHolder(@NonNull View itemView) {
+            super(itemView);
+            categoryNameTextView = itemView.findViewById(R.id.categoryTitleTextView);
+            deleteCategoryButton = itemView.findViewById(R.id.deleteCategoryButton);
+        }
     }
 }

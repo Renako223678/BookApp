@@ -1,4 +1,4 @@
-package com.example.bookapp;
+package com.example.bookapp.Authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,9 +13,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.bookapp.MainActivity;
+import com.example.bookapp.Admin.AdminDashboardActivity;
 import com.example.bookapp.R;
-import com.example.bookapp.RegisterActivity;
+import com.example.bookapp.User.BooksActivity;
+import com.example.bookapp.User.UserDashboardActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -137,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
                         finish();
                     } else if ("user".equals(userType)) {
                         // Chuyển hướng đến bảng điều khiển User
-                        Intent intent = new Intent(LoginActivity.this, UserDashboardActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, BooksActivity.class);
                         startActivity(intent);
                         finish();
                     } else {

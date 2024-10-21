@@ -15,21 +15,33 @@
         android:theme="@style/Theme.BookApp"
         tools:targetApi="31">
         <activity
-            android:name=".UserDashboardActivity"
+            android:name=".Admin.PdfListAdminActivity"
             android:exported="false" />
         <activity
-            android:name=".AdminDashboardActivity"
+            android:name=".User.BooksActivity"
             android:exported="false" />
         <activity
-            android:name=".CategoryAddActivity"
+            android:name=".Admin.AddBookActivity$BooksActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Admin.AddBookActivity"
+            android:exported="false" />
+        <activity
+            android:name=".User.UserDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Admin.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Admin.CategoryAddActivity"
             android:exported="false"
             android:theme="@style/Theme.BookApp" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".Authentication.RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.BookApp" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Authentication.LoginActivity"
             android:exported="false"
             android:theme="@style/Theme.BookApp" />
         <activity
