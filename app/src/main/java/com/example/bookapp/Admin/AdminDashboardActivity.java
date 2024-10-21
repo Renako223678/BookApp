@@ -1,8 +1,7 @@
-package com.example.bookapp;
+package com.example.bookapp.Admin;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -13,7 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookapp.Adapter.AdapterCategory;
+import com.example.bookapp.MainActivity;
 import com.example.bookapp.Models.ModelCategory;
+import com.example.bookapp.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -79,7 +80,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
 
         // PDF button functionality
-        pdfButton.setOnClickListener(v -> exportCategoriesToPDF());
+        pdfButton.setOnClickListener(view -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, AddBookActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void checkUser() {

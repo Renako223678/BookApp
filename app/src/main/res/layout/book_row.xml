@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <!-- Book Thumbnail -->
+        <ImageView
+            android:id="@+id/bookImageView"
+            android:layout_width="80dp"
+            android:layout_height="100dp"
+            android:layout_alignParentStart="true"
+            android:scaleType="centerCrop"
+            android:contentDescription="Book Image"
+            android:background="@drawable/image_placeholder" />
+
+        <!-- Book Title -->
+        <TextView
+            android:id="@+id/bookTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/bookImageView"
+            android:layout_marginStart="16dp"
+            android:text="Book Title"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Book Description -->
+        <TextView
+            android:id="@+id/bookDescriptionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bookTitleTextView"
+            android:layout_toEndOf="@id/bookImageView"
+            android:layout_marginStart="16dp"
+            android:text="Book Description"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- File Size -->
+        <TextView
+            android:id="@+id/fileSizeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bookDescriptionTextView"
+            android:layout_toEndOf="@id/bookImageView"
+            android:layout_marginStart="16dp"
+            android:text="13 MB"
+            android:textSize="12sp" />
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/bookDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bookDescriptionTextView"
+            android:layout_toEndOf="@id/fileSizeTextView"
+            android:layout_marginStart="16dp"
+            android:text="dd/MM/yyyy"
+            android:textSize="12sp" />
+
+        <!-- Category -->
+        <TextView
+            android:id="@+id/bookCategoryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bookDescriptionTextView"
+            android:layout_alignParentEnd="true"
+            android:text="Category"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

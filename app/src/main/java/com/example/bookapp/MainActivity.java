@@ -7,6 +7,9 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.bookapp.Authentication.LoginActivity;
+import com.example.bookapp.Authentication.RegisterActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -17,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
         // Initialize buttons
         Button loginBtn = findViewById(R.id.loginBtn);
         Button noAccountTv = findViewById(R.id.noAccountTv);
-        Button continueWithoutLoginBtn = findViewById(R.id.continueWithoutLoginBtn);
 
 
         // Set click listener for login button
@@ -41,11 +43,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set click listener for "Continue Without Login" button
-        continueWithoutLoginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-            }
-        });
     }
 }
